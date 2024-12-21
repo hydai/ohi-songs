@@ -10,12 +10,18 @@
     <style>
         body {
             font-family: Arial, sans-serif;
+            background-color: #fdf6f2;
         }
         #leftPane, #rightPane {
             margin-top: 20px;
         }
         table {
             margin-top: 20px;
+            border-color: #7b6f63 !important;
+        }
+        th, td {
+            border-color: #7b6f63 !important;
+            vertical-align: middle;
         }
         ul {
             padding: 0;
@@ -33,16 +39,16 @@
             <table class="table table-striped table-bordered" id="songTable">
                 <thead class="table-light">
                     <tr>
-                        <th><input type="text" id="filterTitle" class="form-control" placeholder="曲名"></th>
-                        <th><input type="text" id="filterSinger" class="form-control" placeholder="歌手"></th>
-                        <th>
-                            <select id="filterType" class="form-select">
+                        <th style="height: 60px;"><input type="text" id="filterTitle" class="form-control h-100" placeholder="曲名"></th>
+                        <th style="height: 60px;"><input type="text" id="filterSinger" class="form-control h-100" placeholder="歌手"></th>
+                        <th style="height: 60px;">
+                            <select id="filterType" class="form-select h-100">
                                 <option value="">弾き語り</option>
                                 <option value="〇">〇</option>
                                 <option value="✕">✕</option>
                             </select>
                         </th>
-                        <th><button id="resetFilters" class="btn btn-secondary">重設條件</button></th>
+                        <th style="height: 60px;"><button id="resetFilters" class="btn btn-secondary h-100">重設條件</button></th>
                     </tr>
                 </thead>
                 <tbody>
