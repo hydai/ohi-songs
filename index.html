@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>翻唱歌手網站</title>
+    <title>OhiSongs</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
     <style>
         body {
@@ -42,19 +42,35 @@
         li {
             margin-bottom: 10px;
         }
+        .filter-input {
+            width: 90%;
+            padding: 5px;
+            box-sizing: border-box;
+        }
+        .filter-select {
+            width: 100%;
+            padding: 5px;
+            margin-top: 5px;
+            box-sizing: border-box;
+        }
     </style>
 </head>
 <body>
     <div id="leftPane">
         <h1>我的曲目表</h1>
-        <input type="text" id="search" placeholder="搜尋曲目、歌手或弾き語り">
         <table border="1" id="songTable">
             <thead>
                 <tr>
-                    <th>曲名</th>
-                    <th>歌手</th>
-                    <th>弾き語り</th>
-                    <th>操作</th>
+                    <th><input type="text" id="filterTitle" class="filter-input" placeholder="曲名"></th>
+                    <th><input type="text" id="filterSinger" class="filter-input" placeholder="歌手"></th>
+                    <th>
+                        <select id="filterType" class="filter-select">
+                            <option value="">弾き語り</option>
+                            <option value="〇">〇</option>
+                            <option value="✕">✕</option>
+                        </select>
+                    </th>
+                    <th><button id="resetFilters">重設條件</button></th>
                 </tr>
             </thead>
             <tbody>
@@ -84,19 +100,23 @@
         const parseTSV = (tsv) => {
             const rows = tsv.split("\n").slice(1);
             return rows.map(row => {
-                const [title, singer, type] = row.split("\t");
+                const [title, singer, type] = row.split("\t").map(cell => cell.trim());
                 return { title, singer, type };
             });
         };
 
-        const renderSongs = (songs, filter = "") => {
+        const renderSongs = (songs) => {
+            const filterTitle = $("#filterTitle").val().toLowerCase();
+            const filterSinger = $("#filterSinger").val().toLowerCase();
+            const filterType = $("#filterType").val();
+
             const tbody = $("#songTable tbody");
             tbody.empty();
 
             songs.filter(song =>
-                song.title.includes(filter) ||
-                song.singer.includes(filter) ||
-                song.type.includes(filter)
+                (song.title.toLowerCase().includes(filterTitle)) &&
+                (song.singer.toLowerCase().includes(filterSinger)) &&
+                (filterType === "" || song.type === filterType)
             ).forEach(song => {
                 tbody.append(`
                     <tr>
@@ -117,9 +137,15 @@
                 renderSongs(songs);
             });
 
-            $("#search").on("input", function() {
-                const filter = $(this).val();
-                renderSongs(songs, filter);
+            $("#filterTitle, #filterSinger, #filterType").on("input change", function() {
+                renderSongs(songs);
+            });
+
+            $("#resetFilters").on("click", function() {
+                $("#filterTitle").val("");
+                $("#filterSinger").val("");
+                $("#filterType").val("");
+                renderSongs(songs);
             });
 
             const queue = [];
