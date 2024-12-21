@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>翻唱歌手網站</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <style>
+        body {
+            display: flex;
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+        }
+        #leftPane {
+            width: 60%;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        #rightPane {
+            width: 40%;
+            padding: 20px;
+            box-sizing: border-box;
+            border-left: 1px solid #ccc;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+        table, th, td {
+            border: 1px solid black;
+        }
+        th, td {
+            padding: 8px;
+            text-align: left;
+        }
+        ul {
+            list-style-type: none;
+            padding: 0;
+        }
+        li {
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div id="leftPane">
+        <h1>我的曲目表</h1>
+        <input type="text" id="search" placeholder="搜尋曲目、歌手或弾き語り">
+        <table border="1" id="songTable">
+            <thead>
+                <tr>
+                    <th>曲名</th>
+                    <th>歌手</th>
+                    <th>弾き語り</th>
+                    <th>操作</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Data will be dynamically loaded -->
+            </tbody>
+        </table>
+    </div>
+
+    <div id="rightPane">
+        <h2>待演唱歌曲佇列</h2>
+        <ul id="queue">
+            <!-- Queue items -->
+        </ul>
+
+        <h2>已演唱完畢</h2>
+        <ul id="completedQueue">
+            <!-- Completed items -->
+        </ul>
+
+        <button id="resetQueues">重設佇列</button>
+    </div>
+
+    <script>
+        // Fetch songs from Google Spreadsheet TSV
+        const tsvUrl = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQuZDNzViGTKw9HVs5E1ypbvWFFzZeyYVzYqeVYbWWWWpmtY-0yGOav1D9SqL9_lA5HYVnBCxhjBEIE/pub?gid=0&single=true&output=tsv";
+
+        const parseTSV = (tsv) => {
+            const rows = tsv.split("\n").slice(1);
+            return rows.map(row => {
+                const [title, singer, type] = row.split("\t");
+                return { title, singer, type };
+            });
+        };
+
+        const renderSongs = (songs, filter = "") => {
+            const tbody = $("#songTable tbody");
+            tbody.empty();
+
+            songs.filter(song =>
+                song.title.includes(filter) ||
+                song.singer.includes(filter) ||
+                song.type.includes(filter)
+            ).forEach(song => {
+                tbody.append(`
+                    <tr>
+                        <td>${song.title}</td>
+                        <td>${song.singer}</td>
+                        <td>${song.type}</td>
+                        <td><button class="addToQueue" data-title="${song.title}">加入佇列</button></td>
+                    </tr>
+                `);
+            });
+        };
+
+        $(document).ready(() => {
+            let songs = [];
+
+            $.get(tsvUrl, (data) => {
+                songs = parseTSV(data);
+                renderSongs(songs);
+            });
+
+            $("#search").on("input", function() {
+                const filter = $(this).val();
+                renderSongs(songs, filter);
+            });
+
+            const queue = [];
+            const completedQueue = [];
+
+            $(document).on("click", ".addToQueue", function() {
+                const title = $(this).data("title");
+                if (!queue.includes(title)) {
+                    queue.push(title);
+                    $("#queue").append(`<li>${title} <button class="markComplete" data-title="${title}">已演奏</button></li>`);
+                }
+            });
+
+            $(document).on("click", ".markComplete", function() {
+                const title = $(this).data("title");
+                const index = queue.indexOf(title);
+                if (index > -1) {
+                    queue.splice(index, 1);
+                    completedQueue.push(title);
+                    $(this).parent().remove();
+                    $("#completedQueue").append(`<li>${title}</li>`);
+                }
+            });
+
+            $("#resetQueues").on("click", function() {
+                queue.length = 0;
+                completedQueue.length = 0;
+                $("#queue").empty();
+                $("#completedQueue").empty();
+            });
+        });
+    </script>
+</body>
+</html>
