@@ -30,6 +30,10 @@
             list-style: none;
             margin-bottom: 10px;
         }
+        #queueCount {
+            margin-top: -10px;
+            margin-bottom: 10px;
+        }
     </style>
 </head>
 <body class="container">
@@ -59,6 +63,7 @@
 
         <div id="rightPane" class="col-md-4">
             <h2 class="text-success">待演唱歌曲佇列</h2>
+            <p id="queueCount" class="text-muted">目前有 0 首歌</p>
             <ul id="queue" class="list-group">
                 <!-- Queue items -->
             </ul>
@@ -82,6 +87,11 @@
                 const [title, singer, type] = row.split("\t").map(cell => cell.trim());
                 return { title, singer, type };
             });
+        };
+
+        const updateQueueCount = () => {
+            const count = $("#queue li").length;
+            $("#queueCount").text(`目前有 ${count} 首歌`);
         };
 
         const renderSongs = (songs) => {
@@ -135,6 +145,7 @@
                 if (!queue.includes(title)) {
                     queue.push(title);
                     $("#queue").append(`<li class="list-group-item">${title} <button class="btn btn-success btn-sm markComplete" data-title="${title}">已演奏</button></li>`);
+                    updateQueueCount();
                 }
             });
 
@@ -146,6 +157,7 @@
                     completedQueue.push(title);
                     $(this).parent().remove();
                     $("#completedQueue").append(`<li class="list-group-item">${title}</li>`);
+                    updateQueueCount();
                 }
             });
 
@@ -154,6 +166,7 @@
                 completedQueue.length = 0;
                 $("#queue").empty();
                 $("#completedQueue").empty();
+                updateQueueCount();
             });
         });
     </script>
