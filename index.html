@@ -89,13 +89,14 @@
         </div>
 
         <div id="rightPane" class="col-md-4">
-            <h1 class="text-primary">未演奏の曲キュー</h2>
+            <h1 class="text-primary">未演奏の曲キュー</h1>
+            <button id="randomPick" class="btn btn-primary mb-3">隨機抽選</button>
             <p id="queueCount" class="text-muted">現在0曲あります</p>
             <ul id="queue" class="list-group">
                 <!-- Queue items -->
             </ul>
 
-            <h1 class="text-primary">演奏済みの曲</h2>
+            <h1 class="text-primary">演奏済みの曲</h1>
             <ul id="completedQueue" class="list-group">
                 <!-- Completed items -->
             </ul>
@@ -194,6 +195,18 @@
                 $("#queue").empty();
                 $("#completedQueue").empty();
                 updateQueueCount();
+            });
+
+            $("#randomPick").on("click", function() {
+                const availableSongs = songs.map(song => song.title).filter(title => !queue.includes(title));
+                if (availableSongs.length > 0) {
+                    const randomSong = availableSongs[Math.floor(Math.random() * availableSongs.length)];
+                    queue.push(randomSong);
+                    $("#queue").append(`<li class="list-group-item">${randomSong} <button class="btn btn-success btn-sm markComplete" data-title="${randomSong}">演奏済み</button></li>`);
+                    updateQueueCount();
+                } else {
+                    alert("すべての曲がキューに追加されています。");
+                }
             });
         });
     </script>
