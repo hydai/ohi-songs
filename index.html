@@ -140,7 +140,7 @@
                         <td>${song.title}</td>
                         <td>${song.singer}</td>
                         <td>${song.type}</td>
-                        <td><button class="btn btn-primary addToQueue" data-title="${song.title}">キューに追加</button></td>
+                        <td><button class="btn btn-primary addToQueue" data-title="${song.title}" data-singer="${song.singer}">キューに追加</button></td>
                     </tr>
                 `);
             });
@@ -170,21 +170,23 @@
 
             $(document).on("click", ".addToQueue", function() {
                 const title = $(this).data("title");
-                if (!queue.includes(title)) {
-                    queue.push(title);
-                    $("#queue").append(`<li class="list-group-item">${title} <button class="btn btn-success btn-sm markComplete" data-title="${title}">演奏済み</button></li>`);
+                const singer = $(this).data("singer");
+                const songInfo = `${title}｜${singer}`;
+                if (!queue.includes(songInfo)) {
+                    queue.push(songInfo);
+                    $("#queue").append(`<li class="list-group-item">${songInfo} <button class="btn btn-success btn-sm markComplete" data-title="${songInfo}">演奏済み</button></li>`);
                     updateQueueCount();
                 }
             });
 
             $(document).on("click", ".markComplete", function() {
-                const title = $(this).data("title");
-                const index = queue.indexOf(title);
+                const songInfo = $(this).data("title");
+                const index = queue.indexOf(songInfo);
                 if (index > -1) {
                     queue.splice(index, 1);
-                    completedQueue.push(title);
+                    completedQueue.push(songInfo);
                     $(this).parent().remove();
-                    $("#completedQueue").append(`<li class="list-group-item">${title}</li>`);
+                    $("#completedQueue").append(`<li class="list-group-item">${songInfo}</li>`);
                     updateQueueCount();
                 }
             });
@@ -198,11 +200,12 @@
             });
 
             $("#randomPick").on("click", function() {
-                const availableSongs = songs.map(song => song.title).filter(title => !queue.includes(title));
+                const availableSongs = songs.filter(song => !queue.includes(`${song.title}｜${song.singer}`));
                 if (availableSongs.length > 0) {
                     const randomSong = availableSongs[Math.floor(Math.random() * availableSongs.length)];
-                    queue.push(randomSong);
-                    $("#queue").append(`<li class="list-group-item">${randomSong} <button class="btn btn-success btn-sm markComplete" data-title="${randomSong}">演奏済み</button></li>`);
+                    const songInfo = `${randomSong.title}｜${randomSong.singer}`;
+                    queue.push(songInfo);
+                    $("#queue").append(`<li class="list-group-item">${songInfo} <button class="btn btn-success btn-sm markComplete" data-title="${songInfo}">演奏済み</button></li>`);
                     updateQueueCount();
                 } else {
                     alert("すべての曲がキューに追加されています。");
