@@ -49,6 +49,8 @@
         }
         .list-group-item {
             border-color: #7b6f63 !important;
+            display: flex;
+            align-items: center;
         }
         .text-primary {
             color: #7b6f63 !important;
@@ -60,6 +62,9 @@
         .btn-primary:hover {
             background-color: #695e57 !important;
             border-color: #695e57 !important;
+        }
+        .markComplete {
+            margin-right: 10px;
         }
     </style>
 </head>
@@ -174,7 +179,7 @@
                 const songInfo = `${title}｜${singer}`;
                 if (!queue.includes(songInfo)) {
                     queue.push(songInfo);
-                    $("#queue").append(`<li class="list-group-item">${songInfo} <button class="btn btn-success btn-sm markComplete" data-title="${songInfo}">演奏済み</button></li>`);
+                    $("#queue").append(`<li class="list-group-item"><button class="btn btn-success btn-sm markComplete" data-title="${songInfo}">演奏済み</button> ${songInfo}</li>`);
                     updateQueueCount();
                 }
             });
@@ -205,7 +210,7 @@
                     const randomSong = availableSongs[Math.floor(Math.random() * availableSongs.length)];
                     const songInfo = `${randomSong.title}｜${randomSong.singer}`;
                     queue.push(songInfo);
-                    $("#queue").append(`<li class="list-group-item">${songInfo} <button class="btn btn-success btn-sm markComplete" data-title="${songInfo}">演奏済み</button></li>`);
+                    $("#queue").append(`<li class="list-group-item"><button class="btn btn-success btn-sm markComplete" data-title="${songInfo}">演奏済み</button> ${songInfo}</li>`);
                     updateQueueCount();
                 } else {
                     alert("すべての曲がキューに追加されています。");
